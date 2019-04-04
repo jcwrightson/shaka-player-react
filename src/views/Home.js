@@ -1,23 +1,25 @@
 import React, { Component } from "react";
-
+import * as actions from "../actions";
+import store from "../store";
+import Movies from "../components/Movies";
 export default class Home extends Component {
   constructor(props) {
     super(props);
-    this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick(e) {
-    this.props.history.push("/movie/1");
+  componentWillMount() {
+    const queryAll = `{
+		movies {
+		  id,
+		  name,
+		  manifest
+		}
+	  }`;
+
+    store.dispatch(actions.fetchMovies(queryAll));
   }
 
   render() {
-    return (
-      <div>
-        Home
-        <ul>
-          <li onClick={this.handleClick}>Link</li>
-        </ul>
-      </div>
-    );
+    return <Movies />;
   }
 }
