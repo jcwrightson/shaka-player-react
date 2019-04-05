@@ -1,27 +1,23 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import Home from "./views/Home";
-import Single from "./views/Single";
+import React from "react"
+import ReactDOM from "react-dom"
 
-import { Route, Switch, BrowserRouter } from "react-router-dom";
-import { Provider } from "react-redux";
-import { createBrowserHistory } from "history";
-import { syncHistoryWithStore } from "react-router-redux";
+import { Provider } from "react-redux"
+import { Route, Switch, Router } from "react-router"
+import { history, store } from "./store"
 
-import store from "./store";
+import Single from "./views/Single"
+import Home from "./views/Home"
 
-const browserHistory = createBrowserHistory();
-const history = syncHistoryWithStore(browserHistory, store);
-
+console.log(store)
 ReactDOM.render(
-  <Provider store={store}>
-    <BrowserRouter history={history}>
-      <Switch>
-        <Route exact path='/' component={Home} />
-        <Route path='/movie/:id' component={Single} />
-        <Route component={() => <div>404 &mdash; Not Found</div>} />
-      </Switch>
-    </BrowserRouter>
-  </Provider>,
-  document.getElementById("app")
-);
+	<Provider store={store}>
+		<Router history={history}>
+			<Switch>
+				<Route exact path='/' component={Home} />
+				<Route path='/movie/:id' component={Single} />
+				<Route component={() => <div>404 &mdash; Not Found</div>} />
+			</Switch>
+		</Router>
+	</Provider>,
+	document.getElementById("app")
+)

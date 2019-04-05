@@ -1,33 +1,13 @@
-import { createStore, applyMiddleware } from "redux";
-import { routerReducer, routerMiddleware } from "react-router-redux";
-import { createBrowserHistory } from "history";
-import thunk from "redux-thunk";
+import { createBrowserHistory } from "history"
+import { applyMiddleware, compose, createStore } from "redux"
+import { routerMiddleware } from "connected-react-router"
+import thunk from "redux-thunk"
+import logger from "redux-logger"
+import createRootReducer from "./reducers"
 
-function reducer(
-  state = {
-    movies: [],
-    movie: {},
-    routing: routerReducer
-  },
-  action
-) {
-  switch (action.type) {
-    case "FETCHED_MOVIES": {
-      return { ...state, movies: [...action.payload] };
-    }
-    case "FETCHED_SINGLE_MOVIE": {
-      return {
-        ...state,
-        movie: action.payload
-      };
-    }
-    default: {
-      return state;
-    }
-  }
-}
+export const history = createBrowserHistory()
 
-const browserHistory = createBrowserHistory();
-const middleware = applyMiddleware(thunk, routerMiddleware(browserHistory));
-
-export default createStore(reducer, middleware);
+export const store = createStore(
+	createRootReducer(history),
+	compose(applyMiddleware(routerMiddleware(history), thunk, logger))
+)

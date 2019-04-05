@@ -1,65 +1,69 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
-import shaka from "shaka-player";
+import React, { useEffect } from "react"
+import { connect } from "react-redux"
+import shaka from "shaka-player"
+import Controls from "./Controls"
+import { store } from "../store"
 
-class Movie extends Component {
-  static propTypes = {
-    src: PropTypes.string,
-    currentTime: PropTypes.number,
-    onLoadedMetaData: PropTypes.func, // used to get duration
-    onTimeUpdate: PropTypes.func, // used to get current time
-    play: PropTypes.bool
-  };
+const renderPlayer = props => {
+	// console.log(props)
+	const initPlayer = () => {
+		shaka.polyfill.installAll()
+		const video = document.getElementById(props.id)
+		const player = new shaka.Player(video)
+		player.addEventListener("error", console.error)
+		video.addEventListener("loadedmetadata", props.onLoadedMetaData)
+		video.addEventListener("timeupdate", props.onTimeUpdate)
 
-  constructor(props) {
-    super(props);
-  }
+		player.load(props.src)
 
-  initPlayer() {
-    var video = document.getElementById(this.props.id);
-    var player = new shaka.Player(video);
+		window.player = player
+		window.video = video
+	}
 
-    player.addEventListener("error", this.onErrorEvent);
+	const handleClick = () => {
+		store.dispatch({ type: "PLAYER_TOGGLE_PLAY" })
+	}
 
-    player
-      .load(this.props.src)
-      .then(function() {})
-      .catch(this.onError);
-  }
+	// INIT
+	useEffect(() => {
+		if (props.src) {
+			initPlayer()
+		}
+	}, [props.src])
 
-  onErrorEvent(event) {
-    onError(event.detail);
-  }
+	// PLAY PAUSE
+	useEffect(() => {
+		if (props.play && window.player) {
+			window.video.play()
+		}
 
-  onError(error) {
-    console.error("Error code", error.code, "object", error);
-  }
+		if (!props.play && window.player) {
+			window.video.pause()
+		}
+	}, [props.play])
 
-  componentWillMount() {
-    shaka.polyfill.installAll();
-  }
+	// SEEK
+	useEffect(() => {
+		if (props.seek) {
+			window.video.currentTime = props.seek
+		}
+	}, [props.seek])
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.src !== this.props.src) {
-      if (shaka.Player.isBrowserSupported()) {
-        this.initPlayer();
-      }
-    }
-  }
-
-  render() {
-    return <video id={this.props.id} controls />;
-  }
+	return (
+		<div className='video-container'>
+			<video id={props.id} onClick={handleClick}>
+				<track />
+			</video>
+			<Controls {...props} />
+		</div>
+	)
 }
 
 const mapStateToProps = state => {
-  return {
-    ...state.movie,
-    src: state.movie.manifest
-  };
-};
+	return {
+		...state.app.player
+	}
+}
 
-const Player = connect(mapStateToProps)(Movie);
-
-export default Player;
+const Player = connect(mapStateToProps)(renderPlayer)
+export default Player
