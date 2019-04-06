@@ -1,12 +1,17 @@
+const playerInitialState = {
+	duration: 0,
+	currentTime: 0,
+	play: false,
+	fullscreen: false,
+	seek: null
+}
+
 export default function(
 	state = {
 		movies: [],
 		movie: {},
 		player: {
-			duration: 0,
-			currentTime: 0,
-			play: false,
-			seek: null
+			...playerInitialState
 		}
 	},
 	action
@@ -18,7 +23,7 @@ export default function(
 		case "FETCHED_SINGLE_MOVIE": {
 			return {
 				...state,
-				movie: { ...state.movie, ...action.payload, play: true }
+				movie: { ...state.movie, ...action.payload }
 			}
 		}
 		case "SELECT_MOVIE": {
@@ -34,6 +39,11 @@ export default function(
 		case "PLAYER_TOGGLE_PLAY": {
 			const stateCopy = Object.assign({}, state)
 			stateCopy.player.play = !stateCopy.player.play
+			return stateCopy
+		}
+		case "PLAYER_TOGGLE_FULLSCREEN": {
+			const stateCopy = Object.assign({}, state)
+			stateCopy.player.fullscreen = !stateCopy.player.fullscreen
 			return stateCopy
 		}
 
@@ -61,6 +71,14 @@ export default function(
 				player: {
 					...state.player,
 					seek: action.payload
+				}
+			}
+		}
+		case "PLAYER_RESET": {
+			return {
+				...state,
+				player: {
+					...playerInitialState
 				}
 			}
 		}

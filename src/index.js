@@ -8,7 +8,6 @@ import { history, store } from "./store"
 import Single from "./views/Single"
 import Home from "./views/Home"
 
-console.log(store)
 ReactDOM.render(
 	<Provider store={store}>
 		<Router history={history}>

@@ -2,31 +2,14 @@ import React, { useEffect } from "react"
 import { push } from "connected-react-router"
 import { connect } from "react-redux"
 import { fetchMovies, selectMovie } from "../actions"
-import { store } from "../store"
 
-const mapStateToProps = state => {
-	return {
-		movies: state.app.movies,
-		player: state.app.player
-	}
-}
-
-const mapDispatchToProps = dispatch => {
-	return {
-		onSelectMovie: id => {
-			dispatch(selectMovie(id))
-			dispatch(push(`/movie/${id}`))
-		}
-	}
-}
-
-const renderMovies = ({ movies, onSelectMovie }) => {
+const renderMovies = ({ movies, onLoad, onSelectMovie }) => {
 	useEffect(() => {
-		store.dispatch(fetchMovies())
+		onLoad()
 	}, [])
 
 	return (
-		<div className='movies'>
+		<div className='movies container'>
 			{movies.map(movie => (
 				<div
 					className='movie'
@@ -41,9 +24,26 @@ const renderMovies = ({ movies, onSelectMovie }) => {
 	)
 }
 
+const mapStateToProps = state => {
+	return {
+		movies: state.app.movies
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		onLoad: () => {
+			dispatch(fetchMovies())
+		},
+		onSelectMovie: id => {
+			dispatch(selectMovie(id))
+			dispatch(push(`/movie/${id}`))
+		}
+	}
+}
+
 const Home = connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(renderMovies)
-
+)(React.memo(renderMovies))
 export default Home

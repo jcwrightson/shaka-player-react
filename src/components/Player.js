@@ -2,56 +2,76 @@ import React, { useEffect } from "react"
 import { connect } from "react-redux"
 import shaka from "shaka-player"
 import Controls from "./Controls"
-import { store } from "../store"
 
 const renderPlayer = props => {
-	// console.log(props)
+	const bindEventListeners = video => {
+		video.addEventListener("click", props.onClick)
+		video.addEventListener("dblclick", props.onDoubleClick)
+		video.addEventListener("loadedmetadata", props.onLoadedMetadata)
+		video.addEventListener("timeupdate", props.onTimeUpdate)
+		video.addEventListener("fullscreenchange", props.onFullScreenChange)
+	}
 	const initPlayer = () => {
 		shaka.polyfill.installAll()
 		const video = document.getElementById(props.id)
 		const player = new shaka.Player(video)
 		player.addEventListener("error", console.error)
-		video.addEventListener("loadedmetadata", props.onLoadedMetaData)
-		video.addEventListener("timeupdate", props.onTimeUpdate)
+		player.addEventListener("loaded", console.log)
+		bindEventListeners(video)
 
-		player.load(props.src)
+		player
+			.load(props.src)
+			.then(props.dispatch({ type: "PLAYER_TOGGLE_PLAY" }))
+			.catch(console.error)
 
 		window.player = player
 		window.video = video
 	}
 
-	const handleClick = () => {
-		store.dispatch({ type: "PLAYER_TOGGLE_PLAY" })
-	}
-
-	// INIT
 	useEffect(() => {
 		if (props.src) {
 			initPlayer()
 		}
+
+		return () => {
+			if (window.player) {
+				window.player.destroy()
+			}
+
+			props.dispatch({ type: "PLAYER_RESET" })
+		}
 	}, [props.src])
 
-	// PLAY PAUSE
 	useEffect(() => {
-		if (props.play && window.player) {
+		if (props.play && window.video) {
 			window.video.play()
 		}
 
-		if (!props.play && window.player) {
+		if (!props.play && window.video) {
 			window.video.pause()
 		}
 	}, [props.play])
 
-	// SEEK
 	useEffect(() => {
 		if (props.seek) {
 			window.video.currentTime = props.seek
 		}
 	}, [props.seek])
 
+	useEffect(() => {
+		if (document) {
+			if (props.fullscreen && document.fullscreenEnabled) {
+				window.video.requestFullscreen()
+			}
+			if (!props.fullscreen && document.fullscreenEnabled) {
+				// window.video.exitFullscreen()
+			}
+		}
+	}, [props.fullscreen])
+
 	return (
 		<div className='video-container'>
-			<video id={props.id} onClick={handleClick}>
+			<video id={props.id} autoPlay>
 				<track />
 			</video>
 			<Controls {...props} />
@@ -65,5 +85,5 @@ const mapStateToProps = state => {
 	}
 }
 
-const Player = connect(mapStateToProps)(renderPlayer)
+const Player = connect(mapStateToProps)(React.memo(renderPlayer))
 export default Player

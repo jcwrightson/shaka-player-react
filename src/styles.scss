@@ -5,6 +5,12 @@
 	font-family: monospace;
 }
 
+.container {
+	max-width: 1000px;
+	margin: auto;
+	width: 100%;
+}
+
 label {
 	vertical-align: initial;
 }
@@ -14,7 +20,7 @@ svg {
 }
 
 body {
-	background-color: rgba(0, 0, 0, 0.877);
+	background-color: #000;
 }
 
 video {
@@ -33,14 +39,16 @@ video {
 
 	.movie {
 		display: flex;
-		flex-basis: 25%;
-		padding: 10rem;
-		background-color: #000;
+		flex-basis: 32%;
+		padding: 2rem;
+		background-color: #333;
+
 		color: #fff;
 		cursor: pointer;
 		align-items: center;
 		justify-content: center;
 		border-radius: 6px;
+		min-height: 380px;
 	}
 }
 
@@ -101,7 +109,6 @@ video {
 
 	svg {
 		height: 16px;
-		// width: 20px;
 	}
 }
 
@@ -109,7 +116,7 @@ video {
 	height: 5px;
 	background-color: rgba(51, 51, 51, 0.719);
 	width: 100%;
-	margin: 0 0 1rem 0;
+	margin: 0 0 2rem 0;
 
 	cursor: pointer;
 

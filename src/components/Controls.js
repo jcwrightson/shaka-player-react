@@ -1,33 +1,51 @@
 import React, { useEffect } from "react"
-import { store } from "../store"
 
 const Controls = props => {
 	const handleProgress = () => {
-		const prog = document.querySelector("#progress")
+		const progress = document.querySelector("#progress")
 		const bar = document.querySelector("#bar")
 
-		if (bar && prog) {
+		if (progress && bar) {
 			bar.style.width = `${(props.currentTime / props.duration) *
-				prog.clientWidth}px`
+				progress.clientWidth}px`
 		}
 	}
 
 	const handleTogglePlay = () => {
-		store.dispatch({ type: "PLAYER_TOGGLE_PLAY" })
+		props.dispatch({ type: "PLAYER_TOGGLE_PLAY" })
 	}
 
 	const handleSeekClick = e => {
-		const bounds = e.target.getBoundingClientRect()
+		const progress = document.querySelector("#progress")
+		const bounds = progress.getBoundingClientRect()
 		const seekPosition = e.clientX - bounds.left
 		const seekTime = Math.floor(
-			(seekPosition / e.target.clientWidth) * props.duration
+			(seekPosition / progress.clientWidth) * props.duration
 		)
 
-		store.dispatch({ type: "PLAYER_SEEK", payload: seekTime })
+		props.dispatch({ type: "PLAYER_SEEK", payload: seekTime })
 	}
 
 	const handleToggleFullScreen = () => {
-		window.video.webkitEnterFullScreen()
+		props.dispatch({ type: "PLAYER_TOGGLE_FULLSCREEN" })
+	}
+
+	const formatTime = raw => {
+		const minutes = Math.floor(raw / 60)
+		const seconds = Math.floor(raw - minutes * 60)
+		const hours = Math.floor(raw / 3600)
+
+		if (!hours > 0) {
+			return `${minutes
+				.toString()
+				.padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+		}
+
+		return `${hours
+			.toString()
+			.padStart(2, "0")}:${minutes
+			.toString()
+			.padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
 	}
 
 	useEffect(() => {
@@ -68,8 +86,8 @@ const Controls = props => {
 					</button>
 					<div className='row meta'>
 						<div>
-							{Math.floor(props.currentTime)} /{" "}
-							{Math.floor(props.duration)}
+							{formatTime(props.currentTime)} |{" "}
+							{formatTime(props.duration)}
 						</div>
 					</div>
 					<button onClick={handleToggleFullScreen} type='button'>
