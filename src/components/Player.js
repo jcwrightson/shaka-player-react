@@ -14,8 +14,7 @@ const Player = ({
 	duration,
 	handleTogglePlay,
 	handleToggleFullScreen,
-	handleSeek,
-	handleResetPlayer
+	handleSeek
 }) => {
 	const bindEventListeners = video => {
 		video.addEventListener("click", handleTogglePlay)
@@ -24,34 +23,36 @@ const Player = ({
 		video.addEventListener("timeupdate", onTimeUpdate)
 		video.addEventListener("fullscreenchange", onFullScreenChange)
 	}
-	const initPlayer = () => {
+
+	useEffect(() => {
 		shaka.polyfill.installAll()
 		const video = document.getElementById("video")
 		const player = new shaka.Player(video)
 		player.addEventListener("error", console.error)
-
-		player
-			.load(src)
-			.then(handleTogglePlay)
-			.catch(console.error)
-
 		bindEventListeners(video)
-
 		window.player = player
 		window.video = video
-	}
+	}, [])
 
 	useEffect(() => {
 		if (src) {
-			initPlayer()
+			window.player
+				.load(src)
+				.then(() => {
+					if (currentTime > 0) {
+						handleSeek(currentTime)
+					}
+					if (!play) {
+						handleTogglePlay()
+					}
+				})
+				.catch(console.error)
 		}
 
 		return () => {
-			if (window.player) {
-				window.player.destroy()
+			if (window.player && play) {
+				handleTogglePlay()
 			}
-
-			handleResetPlayer()
 		}
 	}, [src])
 

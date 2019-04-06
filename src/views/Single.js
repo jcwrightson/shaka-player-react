@@ -1,5 +1,6 @@
 import React, { useEffect } from "react"
 import { connect } from "react-redux"
+import { push } from "connected-react-router"
 import { queryMovieById } from "../actions"
 import Player from "../components/Player"
 
@@ -48,6 +49,9 @@ const mapDispatchToProps = dispatch => {
 		},
 		fetchMovie: id => {
 			dispatch(queryMovieById(id))
+		},
+		navigateTo: path => {
+			dispatch(push(path))
 		}
 	}
 }
@@ -61,6 +65,16 @@ const renderSingle = props => {
 
 	return (
 		<div className='single'>
+			<nav>
+				<button
+					type='button'
+					onClick={() => {
+						props.navigateTo("/")
+					}}
+				>
+					Home
+				</button>
+			</nav>
 			<Player src={props.manifest} {...props} />
 		</div>
 	)
@@ -69,5 +83,5 @@ const renderSingle = props => {
 const Single = connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(renderSingle)
+)(React.memo(renderSingle))
 export default Single

@@ -62,7 +62,11 @@ export function queryMovieById(id) {
 }
 
 export function selectMovie(id) {
-	return dispatch => {
-		dispatch({ type: "SELECT_MOVIE", payload: id })
+	return (dispatch, getState) => {
+		const { app } = getState()
+		if (id !== app.movie.id) {
+			dispatch({ type: "SELECT_MOVIE", payload: id })
+			dispatch({ type: "PLAYER_RESET" })
+		}
 	}
 }
