@@ -1,6 +1,6 @@
 import fetch from "node-fetch"
 
-const URI = "http://localhost:3000/graphql"
+const URL = "http://localhost:3000/graphql"
 
 export function fetchMovies() {
 	const query = `{
@@ -11,7 +11,7 @@ export function fetchMovies() {
     }
   }`
 	return dispatch => {
-		fetch(URI, {
+		fetch(URL, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -40,7 +40,7 @@ export function queryMovieById(id) {
     }
   }`
 	return dispatch => {
-		fetch(URI, {
+		fetch(URL, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"

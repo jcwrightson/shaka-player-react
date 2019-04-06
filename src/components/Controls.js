@@ -1,18 +1,21 @@
 import React, { useEffect } from "react"
 
-const Controls = props => {
+const Controls = ({
+	duration,
+	currentTime,
+	play,
+	handleToggleFullScreen,
+	handleTogglePlay,
+	handleSeek
+}) => {
 	const handleProgress = () => {
 		const progress = document.querySelector("#progress")
 		const bar = document.querySelector("#bar")
 
 		if (progress && bar) {
-			bar.style.width = `${(props.currentTime / props.duration) *
+			bar.style.width = `${(currentTime / duration) *
 				progress.clientWidth}px`
 		}
-	}
-
-	const handleTogglePlay = () => {
-		props.dispatch({ type: "PLAYER_TOGGLE_PLAY" })
 	}
 
 	const handleSeekClick = e => {
@@ -20,14 +23,10 @@ const Controls = props => {
 		const bounds = progress.getBoundingClientRect()
 		const seekPosition = e.clientX - bounds.left
 		const seekTime = Math.floor(
-			(seekPosition / progress.clientWidth) * props.duration
+			(seekPosition / progress.clientWidth) * duration
 		)
 
-		props.dispatch({ type: "PLAYER_SEEK", payload: seekTime })
-	}
-
-	const handleToggleFullScreen = () => {
-		props.dispatch({ type: "PLAYER_TOGGLE_FULLSCREEN" })
+		handleSeek(seekTime)
 	}
 
 	const formatTime = raw => {
@@ -50,7 +49,7 @@ const Controls = props => {
 
 	useEffect(() => {
 		handleProgress()
-	}, [props.currentTime])
+	}, [currentTime])
 
 	return (
 		<div className='controls'>
@@ -60,7 +59,7 @@ const Controls = props => {
 			<div className='row'>
 				<div className='row'>
 					<button onClick={handleTogglePlay} type='button'>
-						{props.play ? (
+						{play ? (
 							<svg
 								xmlns='http://www.w3.org/2000/svg'
 								viewBox='0 0 12 14'
@@ -86,8 +85,7 @@ const Controls = props => {
 					</button>
 					<div className='row meta'>
 						<div>
-							{formatTime(props.currentTime)} |{" "}
-							{formatTime(props.duration)}
+							{formatTime(currentTime)} | {formatTime(duration)}
 						</div>
 					</div>
 					<button onClick={handleToggleFullScreen} type='button'>

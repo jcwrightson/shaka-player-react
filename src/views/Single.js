@@ -3,59 +3,31 @@ import { connect } from "react-redux"
 import { queryMovieById } from "../actions"
 import Player from "../components/Player"
 
-const renderSingle = ({
-	match,
-	manifest,
-	id,
-	handleLoadedMetaData,
-	handleTimeUpdate,
-	handleClick,
-	handleDoubleClick,
-	handleFullScreenChange,
-	fetchMovie
-}) => {
-	useEffect(() => {
-		if (!manifest) {
-			fetchMovie(match.params)
-		}
-	}, [manifest])
-
-	return (
-		<div className='single'>
-			<Player
-				id={id}
-				src={manifest}
-				onLoadedMetadata={handleLoadedMetaData}
-				onTimeUpdate={handleTimeUpdate}
-				onClick={handleClick}
-				onDoubleClick={handleDoubleClick}
-				onFullScreenChange={handleFullScreenChange}
-			/>
-		</div>
-	)
-}
-
 const mapStateToProps = state => {
 	return {
-		...state.app.movie
+		...state.app.movie,
+		...state.app.player
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		handleClick: () => {
+		handleResetPlayer: () => {
+			dispatch({ type: "PLAYER_RESET" })
+		},
+		handleTogglePlay: () => {
 			dispatch({ type: "PLAYER_TOGGLE_PLAY" })
 		},
-		handleDoubleClick: () => {
+		handleToggleFullScreen: () => {
 			dispatch({ type: "PLAYER_TOGGLE_FULLSCREEN" })
 		},
-		handleTimeUpdate: e => {
+		onTimeUpdate: e => {
 			dispatch({
 				type: "PLAYER_TIME_UPDATE",
 				payload: e.target.currentTime
 			})
 		},
-		handleLoadedMetaData: e => {
+		onLoadedMetadata: e => {
 			dispatch({
 				type: "PLAYER_LOADED_DURATION",
 				payload: e.target.duration
@@ -71,10 +43,27 @@ const mapDispatchToProps = dispatch => {
 				dispatch({ type: "PLAYER_TOGGLE_FULLSCREEN" })
 			}
 		},
+		handleSeek: time => {
+			dispatch({ type: "PLAYER_SEEK", payload: time })
+		},
 		fetchMovie: id => {
 			dispatch(queryMovieById(id))
 		}
 	}
+}
+
+const renderSingle = props => {
+	useEffect(() => {
+		if (!props.manifest) {
+			props.fetchMovie(props.match.params)
+		}
+	}, [props.manifest])
+
+	return (
+		<div className='single'>
+			<Player src={props.manifest} {...props} />
+		</div>
+	)
 }
 
 const Single = connect(

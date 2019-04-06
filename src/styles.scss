@@ -21,6 +21,7 @@ svg {
 
 body {
 	background-color: #000;
+	color: #fff;
 }
 
 video {
@@ -60,7 +61,7 @@ video {
 		max-height: 90vh;
 	}
 
-	.video-container {
+	.player {
 		position: relative;
 		display: block;
 		width: 100%;

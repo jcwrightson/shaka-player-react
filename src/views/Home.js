@@ -5,8 +5,10 @@ import { fetchMovies, selectMovie } from "../actions"
 
 const renderMovies = ({ movies, onLoad, onSelectMovie }) => {
 	useEffect(() => {
-		onLoad()
-	}, [])
+		if (!movies.length) {
+			onLoad()
+		}
+	}, [movies])
 
 	return (
 		<div className='movies container'>

@@ -1,35 +1,48 @@
 import React, { useEffect } from "react"
-import { connect } from "react-redux"
 import shaka from "shaka-player"
 import Controls from "./Controls"
 
-const renderPlayer = props => {
+const Player = ({
+	src,
+	onFullScreenChange,
+	onTimeUpdate,
+	onLoadedMetadata,
+	seek,
+	play,
+	fullscreen,
+	currentTime,
+	duration,
+	handleTogglePlay,
+	handleToggleFullScreen,
+	handleSeek,
+	handleResetPlayer
+}) => {
 	const bindEventListeners = video => {
-		video.addEventListener("click", props.onClick)
-		video.addEventListener("dblclick", props.onDoubleClick)
-		video.addEventListener("loadedmetadata", props.onLoadedMetadata)
-		video.addEventListener("timeupdate", props.onTimeUpdate)
-		video.addEventListener("fullscreenchange", props.onFullScreenChange)
+		video.addEventListener("click", handleTogglePlay)
+		video.addEventListener("dblclick", handleToggleFullScreen)
+		video.addEventListener("loadedmetadata", onLoadedMetadata)
+		video.addEventListener("timeupdate", onTimeUpdate)
+		video.addEventListener("fullscreenchange", onFullScreenChange)
 	}
 	const initPlayer = () => {
 		shaka.polyfill.installAll()
-		const video = document.getElementById(props.id)
+		const video = document.getElementById("video")
 		const player = new shaka.Player(video)
 		player.addEventListener("error", console.error)
-		player.addEventListener("loaded", console.log)
-		bindEventListeners(video)
 
 		player
-			.load(props.src)
-			.then(props.dispatch({ type: "PLAYER_TOGGLE_PLAY" }))
+			.load(src)
+			.then(handleTogglePlay)
 			.catch(console.error)
+
+		bindEventListeners(video)
 
 		window.player = player
 		window.video = video
 	}
 
 	useEffect(() => {
-		if (props.src) {
+		if (src) {
 			initPlayer()
 		}
 
@@ -38,52 +51,51 @@ const renderPlayer = props => {
 				window.player.destroy()
 			}
 
-			props.dispatch({ type: "PLAYER_RESET" })
+			handleResetPlayer()
 		}
-	}, [props.src])
+	}, [src])
 
 	useEffect(() => {
-		if (props.play && window.video) {
+		if (play && window.video) {
 			window.video.play()
 		}
 
-		if (!props.play && window.video) {
+		if (!play && window.video) {
 			window.video.pause()
 		}
-	}, [props.play])
+	}, [play])
 
 	useEffect(() => {
-		if (props.seek) {
-			window.video.currentTime = props.seek
+		if (seek) {
+			window.video.currentTime = seek
 		}
-	}, [props.seek])
+	}, [seek])
 
 	useEffect(() => {
-		if (document) {
-			if (props.fullscreen && document.fullscreenEnabled) {
-				window.video.requestFullscreen()
-			}
-			if (!props.fullscreen && document.fullscreenEnabled) {
-				// window.video.exitFullscreen()
-			}
+		if (fullscreen && document.fullscreenEnabled) {
+			window.video.requestFullscreen()
 		}
-	}, [props.fullscreen])
+		if (!fullscreen && document.fullscreen) {
+			document.exitFullscreen()
+		}
+	}, [fullscreen])
 
 	return (
-		<div className='video-container'>
-			<video id={props.id} autoPlay>
+		<div className='player'>
+			<video id='video' autoPlay>
 				<track />
 			</video>
-			<Controls {...props} />
+			<Controls
+				currentTime={currentTime}
+				play={play}
+				duration={duration}
+				seek={seek}
+				handleTogglePlay={handleTogglePlay}
+				handleToggleFullScreen={handleToggleFullScreen}
+				handleSeek={handleSeek}
+			/>
 		</div>
 	)
 }
 
-const mapStateToProps = state => {
-	return {
-		...state.app.player
-	}
-}
-
-const Player = connect(mapStateToProps)(React.memo(renderPlayer))
 export default Player
