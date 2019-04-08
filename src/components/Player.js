@@ -19,7 +19,6 @@ const Player = ({
 }) => {
 	const bindEventListeners = video => {
 		video.addEventListener("click", handleTogglePlay)
-		video.addEventListener("dblclick", handleToggleFullScreen)
 		video.addEventListener("loadedmetadata", onLoadedMetadata)
 		video.addEventListener("timeupdate", onTimeUpdate)
 		video.addEventListener("fullscreenchange", handleFullScreenChange)

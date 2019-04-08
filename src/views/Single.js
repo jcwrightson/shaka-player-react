@@ -36,6 +36,7 @@ const mapDispatchToProps = dispatch => {
 			})
 		},
 		handleFullScreenChange: () => {
+			console.log("here")
 			if (
 				!document.fullscreenElement &&
 				!document.webkitIsFullScreen &&
