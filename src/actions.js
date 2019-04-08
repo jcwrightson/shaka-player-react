@@ -1,6 +1,36 @@
-import fetch from "node-fetch"
+import { doFetch, url } from "./api"
 
-const URL = "http://localhost:3000/graphql"
+function selectMovie(id) {
+	return {
+		type: "SELECT_MOVIE",
+		id
+	}
+}
+function requestMovies() {
+	return {
+		type: "REQUEST_MOVIES"
+	}
+}
+
+function requestMovie() {
+	return {
+		type: "REQUEST_MOVIE"
+	}
+}
+
+function receiveMovies(json) {
+	return {
+		type: "RECEIVE_MOVIES",
+		movies: json.data.movies
+	}
+}
+
+function receiveMovie(json) {
+	return {
+		type: "RECEIVE_MOVIE",
+		movie: json.data.movie
+	}
+}
 
 export function fetchMovies() {
 	const query = `{
@@ -10,63 +40,46 @@ export function fetchMovies() {
       manifest
     }
   }`
+
 	return dispatch => {
-		fetch(URL, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				query
-			})
+		dispatch(requestMovies())
+
+		doFetch(url, query).then(json => {
+			if (!json.error) {
+				dispatch(receiveMovies(json))
+			}
 		})
-			.then(res => res.json())
-			.then(json => {
-				return dispatch({
-					type: "FETCHED_MOVIES",
-					payload: json.data.movies
-				})
-			})
-			.catch(console.error)
 	}
 }
 
-export function queryMovieById(id) {
-	const queryById = `query movies($id:String!){
-    movie(id:$id){
-      id,
-      name,
-      manifest
-    }
-  }`
+export function fetchMovieById(id) {
+	console.log("here", id)
+	const query = `query movies($id:String!){
+		    movie(id:$id){
+		      id,
+		      name,
+		      manifest
+		    }
+		  }`
+
 	return dispatch => {
-		fetch(URL, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				query: queryById,
-				variables: id
-			})
+		dispatch(requestMovie())
+
+		doFetch(url, query, id).then(json => {
+			dispatch(receiveMovie(json))
 		})
-			.then(res => res.json())
-			.then(json => {
-				return dispatch({
-					type: "FETCHED_SINGLE_MOVIE",
-					payload: json.data.movie
-				})
-			})
-			.catch(console.error)
 	}
 }
 
-export function selectMovie(id) {
+export function selectMovieById(id) {
 	return (dispatch, getState) => {
-		const { app } = getState()
-		if (id !== app.movie.id) {
-			dispatch({ type: "SELECT_MOVIE", payload: id })
-			dispatch({ type: "PLAYER_RESET" })
+		dispatch(selectMovie(id))
+		const { movies } = getState()
+		const exists = movies.list.filter(movie => movie.id === id)[0]
+		if (exists) {
+			dispatch(receiveMovie({ data: { movie: { ...exists } } }))
+		} else {
+			dispatch(fetchMovieById(id))
 		}
 	}
 }

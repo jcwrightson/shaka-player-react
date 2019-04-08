@@ -14,7 +14,8 @@ const Player = ({
 	duration,
 	handleTogglePlay,
 	handleToggleFullScreen,
-	handleSeek
+	handleSeek,
+	handleResetPlayer
 }) => {
 	const bindEventListeners = video => {
 		video.addEventListener("click", handleTogglePlay)
@@ -42,6 +43,7 @@ const Player = ({
 					if (currentTime > 0) {
 						handleSeek(currentTime)
 					}
+
 					if (!play) {
 						handleTogglePlay()
 					}
@@ -50,8 +52,9 @@ const Player = ({
 		}
 
 		return () => {
-			if (window.player && play) {
-				handleTogglePlay()
+			if (window.player) {
+				window.player.destroy()
+				handleResetPlayer()
 			}
 		}
 	}, [src])

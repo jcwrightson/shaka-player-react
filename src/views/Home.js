@@ -1,34 +1,44 @@
 import React, { useEffect } from "react"
 import { push } from "connected-react-router"
 import { connect } from "react-redux"
-import { fetchMovies, selectMovie } from "../actions"
+import { fetchMovies, selectMovieById } from "../actions"
 
-const renderMovies = ({ movies, onLoad, onSelectMovie }) => {
+const renderMovies = ({ movies, isFetching, onLoad, onSelectMovie }) => {
 	useEffect(() => {
-		if (!movies.length) {
+		if (!movies.length && !isFetching) {
 			onLoad()
 		}
 	}, [movies])
 
 	return (
 		<div className='movies container'>
-			{movies.map(movie => (
-				<div
-					className='movie'
-					key={movie.id}
-					role='presentation'
-					onClick={() => onSelectMovie(movie.id)}
-				>
-					<div>{movie.name}</div>
-				</div>
-			))}
+			{!isFetching && (
+				<React.Fragment>
+					{movies.map(movie => (
+						<div
+							className='movie'
+							key={movie.id}
+							role='presentation'
+							onClick={() => onSelectMovie(movie.id)}
+						>
+							<div>{movie.name}</div>
+						</div>
+					))}
+				</React.Fragment>
+			)}
+			{isFetching && (
+				<React.Fragment>
+					<div className='loading'>Loading...</div>
+				</React.Fragment>
+			)}
 		</div>
 	)
 }
 
 const mapStateToProps = state => {
 	return {
-		movies: state.app.movies
+		movies: state.movies.list,
+		isFetching: state.movies.isFetching
 	}
 }
 
@@ -38,7 +48,7 @@ const mapDispatchToProps = dispatch => {
 			dispatch(fetchMovies())
 		},
 		onSelectMovie: id => {
-			dispatch(selectMovie(id))
+			dispatch(selectMovieById(id))
 			dispatch(push(`/movie/${id}`))
 		}
 	}

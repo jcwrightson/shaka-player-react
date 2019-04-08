@@ -1,13 +1,14 @@
 import React, { useEffect } from "react"
 import { connect } from "react-redux"
 import { push } from "connected-react-router"
-import { queryMovieById } from "../actions"
+import { selectMovieById } from "../actions"
 import Player from "../components/Player"
 
 const mapStateToProps = state => {
 	return {
-		...state.app.movie,
-		...state.app.player
+		...state.movie.item,
+		...state.player,
+		isFetching: state.movie.isFetching
 	}
 }
 
@@ -47,8 +48,8 @@ const mapDispatchToProps = dispatch => {
 		handleSeek: time => {
 			dispatch({ type: "PLAYER_SEEK", payload: time })
 		},
-		fetchMovie: id => {
-			dispatch(queryMovieById(id))
+		onSelectMovie: id => {
+			dispatch(selectMovieById(id))
 		},
 		navigateTo: path => {
 			dispatch(push(path))
@@ -59,7 +60,7 @@ const mapDispatchToProps = dispatch => {
 const renderSingle = props => {
 	useEffect(() => {
 		if (!props.manifest) {
-			props.fetchMovie(props.match.params)
+			props.onSelectMovie(props.match.params)
 		}
 	}, [props.manifest])
 
@@ -75,7 +76,9 @@ const renderSingle = props => {
 					Home
 				</button>
 			</nav>
-			<Player src={props.manifest} {...props} />
+			{props.isFetching && <div className='loading'>loading...</div>}
+
+			{!props.isFetching && <Player src={props.manifest} {...props} />}
 		</div>
 	)
 }
