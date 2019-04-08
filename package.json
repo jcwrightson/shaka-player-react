@@ -1,11 +1,12 @@
 {
-	"name": "magine",
+	"name": "shaka-player-react-demo",
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
 	"scripts": {
 		"precommit": "lint-staged",
 		"test": "echo \"Error: no test specified\" && exit 1",
+		"start:server": "node ./server",
 		"start": "webpack-dev-server --mode development",
 		"build": "webpack --mode production",
 		"lint": "eslint src/ --fix",
@@ -19,7 +20,7 @@
 		]
 	},
 	"keywords": [],
-	"author": "",
+	"author": "jcwrightson",
 	"license": "ISC",
 	"devDependencies": {
 		"@babel/core": "^7.4.3",
@@ -51,6 +52,9 @@
 		"webpack-dev-server": "^3.2.1"
 	},
 	"dependencies": {
+		"express": "^4.16.3",
+		"express-graphql": "^0.6.12",
+		"graphql": "^0.13.2",
 		"@babel/runtime": "^7.4.3",
 		"connected-react-router": "^6.3.2",
 		"cross-fetch": "^3.0.2",

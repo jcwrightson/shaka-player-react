@@ -16,7 +16,9 @@
 		"jsx-a11y/click-events-have-key-events": "never",
 		"jsx-a11y/media-has-caption": "never",
 		"no-console": "off",
-		"no-shadow": "off"
+		"no-shadow": "off",
+		"consistent-return": "off",
+		"no-multi-assign": "off"
 	},
 	"globals": {
 		"window": true,
