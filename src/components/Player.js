@@ -4,7 +4,6 @@ import Controls from "./Controls"
 
 const Player = ({
 	src,
-	onFullScreenChange,
 	onTimeUpdate,
 	onLoadedMetadata,
 	seek,
@@ -14,6 +13,7 @@ const Player = ({
 	duration,
 	handleTogglePlay,
 	handleToggleFullScreen,
+	handleFullScreenChange,
 	handleSeek,
 	handleResetPlayer
 }) => {
@@ -22,7 +22,7 @@ const Player = ({
 		video.addEventListener("dblclick", handleToggleFullScreen)
 		video.addEventListener("loadedmetadata", onLoadedMetadata)
 		video.addEventListener("timeupdate", onTimeUpdate)
-		video.addEventListener("fullscreenchange", onFullScreenChange)
+		video.addEventListener("fullscreenchange", handleFullScreenChange)
 	}
 
 	useEffect(() => {
