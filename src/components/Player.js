@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import shaka from "shaka-player"
 import Controls from "./Controls"
 
@@ -17,26 +17,20 @@ const Player = ({
 	handleSeek,
 	handleResetPlayer
 }) => {
-	const bindEventListeners = video => {
-		video.addEventListener("click", handleTogglePlay)
-		video.addEventListener("loadedmetadata", onLoadedMetadata)
-		video.addEventListener("timeupdate", onTimeUpdate)
-		video.addEventListener("fullscreenchange", handleFullScreenChange)
-	}
+	const videoElem = useRef(null)
+	let player = null
+
+	// ToDo:
+	document.addEventListener("fullscreenchange", handleFullScreenChange)
 
 	useEffect(() => {
 		shaka.polyfill.installAll()
-		const video = document.getElementById("video")
-		const player = new shaka.Player(video)
-		player.addEventListener("error", console.error)
-		bindEventListeners(video)
-		window.player = player
-		window.video = video
+		player = new shaka.Player(videoElem.current)
 	}, [])
 
 	useEffect(() => {
 		if (src) {
-			window.player
+			player
 				.load(src)
 				.then(() => {
 					if (currentTime > 0) {
@@ -51,32 +45,32 @@ const Player = ({
 		}
 
 		return () => {
-			if (window.player) {
-				window.player.destroy()
+			if (player) {
+				player.destroy()
 				handleResetPlayer()
 			}
 		}
 	}, [src])
 
 	useEffect(() => {
-		if (play && window.video) {
-			window.video.play()
+		if (play && videoElem.current) {
+			videoElem.current.play()
 		}
 
-		if (!play && window.video) {
-			window.video.pause()
+		if (!play && videoElem.current) {
+			videoElem.current.pause()
 		}
 	}, [play])
 
 	useEffect(() => {
 		if (seek) {
-			window.video.currentTime = seek
+			videoElem.current.currentTime = seek
 		}
 	}, [seek])
 
 	useEffect(() => {
 		if (fullscreen && document.fullscreenEnabled) {
-			window.video.requestFullscreen()
+			videoElem.current.requestFullscreen()
 		}
 		if (!fullscreen && document.fullscreen) {
 			document.exitFullscreen()
@@ -85,7 +79,14 @@ const Player = ({
 
 	return (
 		<div className='player'>
-			<video id='video' autoPlay>
+			<video
+				id='video'
+				ref={videoElem}
+				onClick={handleTogglePlay}
+				onLoadedMetadata={onLoadedMetadata}
+				onTimeUpdate={onTimeUpdate}
+				autoPlay
+			>
 				<track />
 			</video>
 			<Controls
