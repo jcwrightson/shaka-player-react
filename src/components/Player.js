@@ -41,6 +41,7 @@ const Player = ({
 						handleTogglePlay()
 					}
 				})
+				/* eslint-disable-next-line no-console */
 				.catch(console.error)
 		}
 

@@ -11,5 +11,3 @@ export const store = createStore(
 	createRootReducer(history),
 	compose(applyMiddleware(routerMiddleware(history), thunk, logger))
 )
-
-console.log(store.getState())

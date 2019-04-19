@@ -53,7 +53,6 @@ export function fetchMovies() {
 }
 
 export function fetchMovieById(id) {
-	console.log("here", id)
 	const query = `query movies($id:String!){
 		    movie(id:$id){
 		      id,
