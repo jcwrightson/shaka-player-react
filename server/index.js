@@ -1,13 +1,10 @@
 const express = require("express")
+const cors = require("cors")
 const graphqlMiddleware = require("./graphql")
 
 const app = express()
 
-app.options("/graphql", (req, res) => {
-	res.setHeader("access-control-allow-origin", "*")
-	res.setHeader("access-control-allow-headers", "*")
-	res.sendStatus(200)
-})
+app.use(cors())
 
 app.use("/graphql", graphqlMiddleware())
 
