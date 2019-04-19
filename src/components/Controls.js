@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 
 const Controls = ({
 	duration,
@@ -8,22 +8,21 @@ const Controls = ({
 	handleTogglePlay,
 	handleSeek
 }) => {
-	const handleProgress = () => {
-		const progress = document.querySelector("#progress")
-		const bar = document.querySelector("#bar")
+	const progContainer = useRef(null)
+	const progBar = useRef(null)
 
-		if (progress && bar) {
-			bar.style.width = `${(currentTime / duration) *
-				progress.clientWidth}px`
+	const handleProgress = () => {
+		if (progContainer.current && progBar.current) {
+			progBar.current.style.width = `${(currentTime / duration) *
+				progContainer.current.clientWidth}px`
 		}
 	}
 
 	const handleSeekClick = e => {
-		const progress = document.querySelector("#progress")
-		const bounds = progress.getBoundingClientRect()
+		const bounds = progContainer.current.getBoundingClientRect()
 		const seekPosition = e.clientX - bounds.left
 		const seekTime = Math.floor(
-			(seekPosition / progress.clientWidth) * duration
+			(seekPosition / progContainer.current.clientWidth) * duration
 		)
 
 		handleSeek(seekTime)
@@ -53,8 +52,13 @@ const Controls = ({
 
 	return (
 		<div className='controls'>
-			<div id='progress' onClick={handleSeekClick} role='presentation'>
-				<div id='bar' />
+			<div
+				id='progress'
+				ref={progContainer}
+				onClick={handleSeekClick}
+				role='presentation'
+			>
+				<div id='bar' ref={progBar} />
 			</div>
 			<div className='row'>
 				<div className='row'>
